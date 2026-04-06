@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DBMS Lab – Sanjivani University</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Sora:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e1a;--card:#111827;--card2:#1a2236;--accent:#00d4ff;--accent2:#7c3aed;--green:#10b981;--red:#ef4444;--text:#e2e8f0;--muted:#94a3b8;--border:#1e293b;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-height:100vh;}
+nav{background:rgba(10,14,26,0.95);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);}
+.logo{font-family:'JetBrains Mono',monospace;font-size:1.1rem;color:var(--accent);font-weight:700;}.logo span{color:var(--accent2);}
+.nav-tabs{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap;}
+.nav-tab{padding:8px 18px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-family:'Sora',sans-serif;font-size:0.85rem;transition:all 0.2s;}
+.nav-tab:hover,.nav-tab.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:600;}
+.hero{padding:40px 24px 24px;text-align:center;background:radial-gradient(ellipse at 50% 0%,rgba(0,212,255,0.08) 0%,transparent 60%);}
+.hero h1{font-size:2rem;font-weight:800;}.hero h1 span{color:var(--accent);}
+.hero p{color:var(--muted);margin-top:8px;font-size:0.95rem;}
+.badge{display:inline-block;background:var(--accent2);color:#fff;padding:4px 12px;border-radius:20px;font-size:0.75rem;margin-bottom:12px;font-weight:600;}
+.section{display:none;padding:20px 16px 40px;max-width:900px;margin:0 auto;}.section.active{display:block;}
+.prac-grid{display:flex;flex-direction:column;gap:16px;}
+.prac-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;transition:border-color 0.2s;}
+.prac-card:hover{border-color:var(--accent);}
+.prac-header{display:flex;align-items:center;gap:14px;padding:16px 20px;}
+.prac-num{width:42px;height:42px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-weight:700;color:#000;font-size:0.9rem;flex-shrink:0;}
+.prac-title{font-weight:600;font-size:0.95rem;flex:1;}
+.prac-arrow{color:var(--muted);transition:transform 0.3s;font-size:1.1rem;}
+.prac-card.open .prac-arrow{transform:rotate(90deg);}
+.prac-body{display:none;padding:0 20px 20px;border-top:1px solid var(--border);}
+.prac-card.open .prac-body{display:block;}
+.prac-body h3{color:var(--accent);font-size:0.85rem;font-family:'JetBrains Mono',monospace;margin:14px 0 6px;text-transform:uppercase;letter-spacing:0.08em;}
+.prac-body p,.prac-body ul{color:var(--muted);font-size:0.88rem;line-height:1.65;}
+.prac-body ul{padding-left:18px;}.prac-body ul li{margin-bottom:2px;}
+pre{background:#0d1117;border:1px solid #1e293b;border-radius:10px;padding:16px;font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:#c9d1d9;overflow-x:auto;margin-top:8px;line-height:1.7;white-space:pre-wrap;word-break:break-word;}
+.kw{color:#ff79c6;}.fn{color:#50fa7b;}.str{color:#f1fa8c;}.cm{color:#6272a4;font-style:italic;}.num{color:#bd93f9;}.type{color:#8be9fd;}
+.purpose-box{background:rgba(0,212,255,0.06);border:1px solid rgba(0,212,255,0.2);border-radius:10px;padding:12px 16px;margin-top:10px;}
+.purpose-box .label{font-size:0.75rem;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;}
+.purpose-box p{font-size:0.87rem;color:var(--text);}
+/* MCQ */
+.mcq-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;}
+.mcq-top h2{font-size:1.3rem;font-weight:800;}
+.mcq-stats{color:var(--muted);font-size:0.85rem;}
+.unit-filter{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.unit-btn{padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-family:'Sora',sans-serif;font-size:0.8rem;transition:all 0.2s;}
+.unit-btn:hover,.unit-btn.active{background:var(--accent2);color:#fff;border-color:var(--accent2);}
+.progress-bar{height:4px;background:var(--border);border-radius:2px;margin-bottom:20px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width 0.4s;}
+.score-box{display:none;text-align:center;padding:30px;background:var(--card);border:2px solid var(--accent);border-radius:16px;margin-bottom:24px;}
+.score-num{font-size:3rem;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace;}
+.score-box p{color:var(--muted);margin-top:8px;}
+.retry-btn{margin-top:16px;padding:10px 28px;border-radius:10px;background:var(--accent2);color:#fff;border:none;cursor:pointer;font-family:'Sora',sans-serif;font-weight:600;}
+.mcq-list{display:flex;flex-direction:column;gap:18px;}
+.mcq-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px 20px;}
+.mcq-q{font-size:0.92rem;font-weight:600;margin-bottom:12px;}
+.mcq-q span{color:var(--accent);font-family:'JetBrains Mono',monospace;margin-right:6px;}
+.unit-tag{display:inline-block;background:rgba(124,58,237,0.2);color:var(--accent2);padding:2px 8px;border-radius:4px;font-size:0.72rem;font-weight:600;margin-left:6px;vertical-align:middle;}
+.mcq-options{display:flex;flex-direction:column;gap:8px;}
+.mcq-option{padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--card2);cursor:pointer;font-size:0.87rem;transition:all 0.18s;display:flex;align-items:center;gap:10px;}
+.mcq-option:hover{border-color:var(--accent);background:rgba(0,212,255,0.06);}
+.mcq-option.selected{border-color:var(--accent2);background:rgba(124,58,237,0.12);}
+.mcq-option.correct{border-color:var(--green)!important;background:rgba(16,185,129,0.12)!important;}
+.mcq-option.wrong{border-color:var(--red)!important;background:rgba(239,68,68,0.1)!important;}
+.opt-label{width:22px;height:22px;border-radius:5px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;flex-shrink:0;}
+.submit-btn{display:block;width:100%;padding:16px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;font-weight:800;font-size:1rem;border:none;cursor:pointer;margin-top:24px;font-family:'Sora',sans-serif;}
+.mcq-explain{display:none;margin-top:10px;padding:10px 14px;background:rgba(16,185,129,0.07);border-left:3px solid var(--green);border-radius:0 8px 8px 0;font-size:0.83rem;color:var(--muted);line-height:1.6;}
+.mcq-item.revealed .mcq-explain{display:block;}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">DBMS<span>.lab</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showSection('practicals',this)">📋 Practicals</button>
+    <button class="nav-tab" onclick="showSection('mcq',this)">🧠 MCQ Quiz</button>
+  </div>
+</nav>
+<div class="hero">
+  <div class="badge">Sanjivani University · AIML Dept</div>
+  <h1>DBMS Lab <span>Exam Prep</span></h1>
+  <p>All 10 practicals with explanation + 150 Official MCQs (5 Units)</p>
+</div>
+
+<!-- PRACTICALS -->
+<div class="section active" id="practicals">
+<div class="prac-grid">
+
+<div class="prac-card" onclick="togglePrac(this)">
+  <div class="prac-header"><div class="prac-num">P1</div><div class="prac-title">Install MySQL & Basic Operations (INSERT, UPDATE, DELETE, SELECT)</div><div class="prac-arrow">▶</div></div>
+  <div class="prac-body">
+    <div class="purpose-box"><div class="label">🎯 Purpose</div><p>Set up MySQL and perform fundamental CRUD operations on a database table.</p></div>
+    <h3>Steps</h3>
+    <p>1. Install XAMPP → start Apache & MySQL → open phpMyAdmin.<br>2. Open MySQL terminal or phpMyAdmin SQL tab.<br>3. Create database & table, insert data, then SELECT / UPDATE / DELETE.</p>
+    <h3>SQL Code</h3>
+<pre><span class="kw">CREATE DATABASE</span> empDB;
+<span class="kw">USE</span> empDB;
+
+<span class="kw">CREATE TABLE</span> <span class="fn">Employee</span> (
+  EmpID  <span class="type">INT</span> <span class="kw">PRIMARY KEY</span>,
+  Name   <span class="type">VARCHAR</span>(<span class="num">50</span>),
+  Salary <span class="type">DECIMAL</span>(<span class="num">10</span>,<span class="num">2</span>),
+  Dept   <span class="type">VARCHAR</span>(<span class="num">30</span>)
+);
+
+<span class="kw">INSERT INTO</span> Employee <span class="kw">VALUES</span>
+(<span class="num">1</span>,<span class="str">'Ravi'</span>,<span class="num">45000</span>,<span class="str">'AIML'</span>),
+(<span class="num">2</span>,<span class="str">'Priya'</span>,<span class="num">52000</span>,<span class="str">'CS'</span>),
+(<span class="num">3</span>,<span class="str">'Amit'</span>,<span class="num">38000</span>,<span class="str">'IT'</span>);
+
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> Employee;
+<span class="kw">UPDATE</span> Employee <span class="kw">SET</span> Salary=<span class="num">50000</span> <span class="kw">WHERE</span> EmpID=<span class="num">3</span>;
+<span class="kw">DELETE FROM</span> Employee <span class="kw">WHERE</span> EmpID=<span class="num">2</span>;</pre>
+  </div>
+</div>
+
+<div class="prac-card" onclick="togglePrac(this)">
+  <div class="prac-header"><div class="prac-num">P2</div><div class="prac-title">ER Diagram – Roadway Travel Management System</div><div class="prac-arrow">▶</div></div>
+  <div class="prac-body">
+    <div class="purpose-box"><div class="label">🎯 Purpose</div><p>Design an ER diagram to model real-world entities and relationships, then implement as SQL tables.</p></div>
+    <h3>Entities</h3>
+    <ul><li><strong>Customer</strong>: CustomerID (PK), Name, Phone, Email</li><li><strong>TravelRoute</strong>: RouteID (PK), Source, Destination, Distance</li><li><strong>Booking</strong>: BookingID (PK), CustomerID (FK), RouteID (FK), Date, Seats</li></ul>
+    <h3>SQL Code</h3>
+<pre><span class="kw">CREATE TABLE</span> Customer (
+  CustomerID <span class="type">INT</span> <span class="kw">PRIMARY KEY</span>,
+  Name <span class="type">VARCHAR</span>(<span class="num">60</span>), Phone <span class="type">VARCHAR</span>(<span class="num">15</span>), Email <span class="type">VARCHAR</span>(<span class="num">80</span>)
+);
+<span class="kw">CREATE TABLE</span> TravelRoute (
+  RouteID <span class="type">INT</span> <span class="kw">PRIMARY KEY</span>,
+  Source <span class="type">VARCHAR</span>(<span class="num">50</span>), Destination <span class="type">VARCHAR</span>(<span class="num">50</span>), Distance <span class="type">FLOAT</span>
+);
+<span class="kw">CREATE TABLE</span> Booking (
+  BookingID <span class="type">INT</span> <span class="kw">PRIMARY KEY</span>,
+  CustomerID <span class="type">INT</span>, RouteID <span class="type">INT</span>, BookDate <span class="type">DATE</span>, Seats <span class="type">INT</span>,
+  <span class="kw">FOREIGN KEY</span>(CustomerID) <span class="kw">REFERENCES</span> Customer(CustomerID),
+  <span class="kw">FOREIGN KEY</span>(RouteID) <span class="kw">REFERENCES</span> TravelRoute(RouteID)
+);
+<span class="kw">INSERT INTO</span> Customer <span class="kw">VALUES</span>(<span class="num">1</span>,<span class="str">'Sneha'</span>,<span class="str">'9876543210'</span>,<span class="str">'sneha@mail.com'</span>);
+<span class="kw">INSERT INTO</span> TravelRoute <span class="kw">VALUES</span>(<span class="num">1</span>,<span class="str">'Pune'</span>,<span class="str">'Mumbai'</span>,<span class="num">148.5</span>);
+<span class="kw">INSERT INTO</span> Booking <span class="kw">VALUES</span>(<span class="num">1</span>,<span class="num">1</span>,<span class="num">1</span>,<span class="str">'2026-04-06'</span>,<span class="num">2</span>);</pre>
+  </div>
+</div>
+
+<div class="prac-card" onclick="togglePrac(this)">
+  <div class="prac-header"><div class="prac-num">P3</div><div class="prac-title">Data Types – EmployeeID, Name, Salary, JoiningDate, ActiveStatus</div><div class="prac-arrow">▶</div></div>
+  <div class="prac-body">
+    <div class="purpose-box"><div class="label">🎯 Purpose</div><p>Learn SQL data types (INT, VARCHAR, DECIMAL, DATE, BOOLEAN) by creating and querying a typed table.</p></div>
+    <h3>SQL Code</h3>
+<pre><span class="kw">CREATE TABLE</span> EmpDetails (
+  EmployeeID   <span class="type">INT</span>           <span class="kw">PRIMARY KEY</span>,
+  Name         <span class="type">VARCHAR</span>(<span class="num">100</span>) <span class="kw">NOT NULL</span>,
+  Salary       <span class="type">DECIMAL</span>(<span class="num">10</span>,<span class="num">2</span>),
+  JoiningDate  <span class="type">DATE</span>,
+  ActiveStatus <span class="type">BOOLEAN</span> <span class="kw">DEFAULT</span> <span class="num">TRUE</span>
+);
+<span class="kw">INSERT INTO</span> EmpDetails <span class="kw">VALUES</span>
+(<span class="num">101</span>,<span class="str">'Rahul Sharma'</span>,<span class="num">75000.50</span>,<span class="str">'2022-06-15'</span>,<span class="num">TRUE</span>),
+(<span class="num">102</span>,<span class="str">'Neha Patel'</span>,<span class="num">62000.00</span>,<span class="str">'2023-01-20'</span>,<span class="num">FALSE</span>),
+(<span class="num">103</span>,<span class="str">'Kiran More'</span>,<span class="num">49000.75</span>,<span class="str">'2024-03-01'</span>,<span class="num">TRUE</span>);
+<span class="kw">SELECT</span> Name, Salary <span class="kw">FROM</span> EmpDetails <span class="kw">WHERE</span> ActiveStatus = <span class="num">TRUE</span>;
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> EmpDetails <span class="kw">WHERE</span> JoiningDate > <span class="str">'2022-12-31'</span>;</pre>
+  </div>
+</div>
+
+<div class="prac-card" onclick="togglePrac(this)">
+  <div class="prac-header"><div class="prac-num">P4</div><div class="prac-title">Constraints – Primary Key, Foreign Key, Unique</div><div class="prac-arrow">▶</div></div>
+  <div class="prac-body">
+    <div class="purpose-box"><div class="label">🎯 Purpose</div><p>Test PK, FK, UNIQUE constraints with both valid and invalid data to observe MySQL errors.</p></div>
+    <h3>SQL Code</h3>
+<pre><span class="kw">CREATE TABLE</span> Department (
+  DeptID   <span class="type">INT</span> <span class="kw">PRIMARY KEY</span>,
+  DeptName <span class="type">VARCHAR</span>(<span class="num">50</span>) <span class="kw">UNIQUE</span>
+);
+<span class="kw">CREATE TABLE</span> EmpInfo (
+  EmpID  <span class="type">INT</span> <span class="kw">PRIMARY KEY</span>,
+  Email  <span class="type">VARCHAR</span>(<span class="num">100</span>) <span class="kw">UNIQUE</span>,
+  DeptID <span class="type">INT</span>,
+  <span class="kw">FOREIGN KEY</span>(DeptID) <span class="kw">REFERENCES</span> Department(DeptID)
+);
+<span class="kw">INSERT INTO</span> Department <span class="kw">VALUES</span>(<span class="num">1</span>,<span class="str">'AIML'</span>);
+<span class="kw">INSERT INTO</span> EmpInfo <span class="kw">VALUES</span>(<span class="num">1</span>,<span class="str">'a@b.com'</span>,<span class="num">1</span>);
+<span class="cm">-- PK violation (ERROR)</span>
+<span class="kw">INSERT INTO</span> EmpInfo <span class="kw">VALUES</span>(<span class="num">1</span>,<span class="str">'c@d.com'</span>,<span class="num">1</span>);
+<span class="cm">-- UNIQUE violation (ERROR)</span>
+<span class="kw">INSERT INTO</span> EmpInfo <span class="kw">VALUES</span>(<span class="num">2</span>,<span class="str">'a@b.com'</span>,<span class="num">1</span>);
+<span class="cm">-- FK violation (ERROR: DeptID 99 does not exist)</span>
+<span class="kw">INSERT INTO</span> EmpInfo <span class="kw">VALUES</span>(<span class="num">3</span>,<span class="str">'x@y.com'</span>,<span class="num">99</span>);</pre>
+  </div>
+</div>
+
+<div class="prac-card" onclick="togglePrac(this)">
+  <div class="prac-header"><div class="prac-num">P5</div><div class="prac-title">Integrity Constraints – NOT NULL, CHECK, DEFAULT</div><div class="prac-arrow">▶</div></div>
+  <div class="prac-body">
+    <div class="purpose-box"><div class="label">🎯 Purpose</div><p>NOT NULL prevents empty values, CHECK validates data range, DEFAULT fills missing values automatically.</p></div>
+    <h3>SQL Code</h3>
+<pre><span class="kw">CREATE TABLE</span> CustomerDetails (
+  CustID <span class="type">INT</span>         <span class="kw">PRIMARY KEY</span>,
+  Name   <span class="type">VARCHAR</span>(<span class="num">80</span>) <span class="kw">NOT NULL</span>,
+  Age    <span class="type">INT</span>         <span class="kw">CHECK</span>(Age >= <span class="num">18</span> <span class="kw">AND</span> Age <= <span class="num">100</span>),
+  City   <span class="type">VARCHAR</span>(<span class="num">50</span>) <span class="kw">DEFAULT</span> <span class="str">'Pune'</span>
+);
+<span class="cm">-- Valid: City defaults to Pune</span>
+<span class="kw">INSERT INTO</span> CustomerDetails(CustID,Name,Age) <span class="kw">VALUES</span>(<span class="num">1</span>,<span class="str">'Anjali'</span>,<span class="num">25</span>);
+<span class="cm">-- NOT NULL violation (ERROR)</span>
+<span class="kw">INSERT INTO</span> CustomerDetails <span class="kw">VALUES</span>(<span class="num">2</span>,<span class="kw">NULL</span>,<span class="num">30</span>,<span class="str">'Mumbai'</span>);
+<span class="cm">-- CHECK violation: 15 &lt; 18 (ERROR)</span>
+<span class="kw">INSERT INTO</span> CustomerDetails <span class="kw">VALUES</span>(<span class="num">3</span>,<span class="str">'Raj'</span>,<span class="num">15</span>,<span class="str">'Nashik'</span>);
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> CustomerDetails;</pre>
+  </div>
+</div>
+
+<div class="prac-card" onclick="togglePrac(this)">
+  <div class="prac-header"><div class="prac-num">P6</div><div class="prac-title">DDL & DML Commands – CREATE, ALTER, DROP + INSERT, UPDATE, DELETE</div><div class="prac-arrow">▶</div></div>
+  <div class="prac-body">
+    <div class="purpose-box"><div class="label">🎯 Purpose</div><p>DDL changes table structure; DML changes data. Practice both on a Products table.</p></div>
+    <h3>SQL Code</h3>
+<pre><span class="cm">-- DDL</span>
+<span class="kw">CREATE TABLE</span> Products (PID <span class="type">INT</span> <span class="kw">PRIMARY KEY</span>, PName <span class="type">VARCHAR</span>(<span class="num">80</span>), Price <span class="type">DECIMAL</span>(<span class="num">8</span>,<span class="num">2</span>));
+<span class="kw">ALTER TABLE</span> Products <span class="kw">ADD</span> Stock <span class="type">INT</span> <span class="kw">DEFAULT</span> <span class="num">0</span>;
+<span class="kw">ALTER TABLE</span> Products <span class="kw">MODIFY</span> PName <span class="type">VARCHAR</span>(<span class="num">120</span>);
+<span class="cm">-- DML</span>
+<span class="kw">INSERT INTO</span> Products <span class="kw">VALUES</span>(<span class="num">1</span>,<span class="str">'Laptop'</span>,<span class="num">55000</span>,<span class="num">10</span>),(<span class="num">2</span>,<span class="str">'Mouse'</span>,<span class="num">599</span>,<span class="num">50</span>);
+<span class="kw">UPDATE</span> Products <span class="kw">SET</span> Price=<span class="num">52000</span> <span class="kw">WHERE</span> PID=<span class="num">1</span>;
+<span class="kw">DELETE FROM</span> Products <span class="kw">WHERE</span> PID=<span class="num">2</span>;
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> Products;
+<span class="cm">-- DROP removes table permanently</span>
+<span class="cm">-- DROP TABLE Products;</span></pre>
+  </div>
+</div>
+
+<div class="prac-card" onclick="togglePrac(this)">
+  <div class="prac-header"><div class="prac-num">P7</div><div class="prac-title">Normalization – 1NF, 2NF, 3NF, BCNF</div><div class="prac-arrow">▶</div></div>
+  <div class="prac-body">
+    <div class="purpose-box"><div class="label">🎯 Purpose</div><p>Eliminate data redundancy and anomalies by decomposing an unnormalized table step-by-step.</p></div>
+    <h3>Quick Reference</h3>
+    <ul><li><strong>1NF</strong>: Atomic values, no repeating groups</li><li><strong>2NF</strong>: 1NF + No partial dependencies</li><li><strong>3NF</strong>: 2NF + No transitive dependencies</li><li><strong>BCNF</strong>: Every determinant is a candidate key</li></ul>
+    <h3>SQL Code</h3>
+<pre><span class="cm">-- 1NF: Atomic values per cell</span>
+<span class="kw">CREATE TABLE</span> Orders_1NF (
+  OrderID <span class="type">INT</span>, CustName <span class="type">VARCHAR</span>(<span class="num">60</span>), Item <span class="type">VARCHAR</span>(<span class="num">50</span>),
+  <span class="kw">PRIMARY KEY</span>(OrderID, Item)
+);
+<span class="cm">-- 2NF: Remove partial dependency</span>
+<span class="kw">CREATE TABLE</span> Customers_2NF (CustID <span class="type">INT</span> <span class="kw">PRIMARY KEY</span>, CustName <span class="type">VARCHAR</span>(<span class="num">60</span>));
+<span class="kw">CREATE TABLE</span> OrderItems_2NF (
+  OrderID <span class="type">INT</span>, CustID <span class="type">INT</span>, Item <span class="type">VARCHAR</span>(<span class="num">50</span>),
+  <span class="kw">PRIMARY KEY</span>(OrderID,Item),
+  <span class="kw">FOREIGN KEY</span>(CustID) <span class="kw">REFERENCES</span> Customers_2NF(CustID)
+);
+<span class="cm">-- 3NF: Remove transitive dependency</span>
+<span class="kw">CREATE TABLE</span> ZipCity (ZipCode <span class="type">VARCHAR</span>(<span class="num">10</span>) <span class="kw">PRIMARY KEY</span>, City <span class="type">VARCHAR</span>(<span class="num">50</span>));</pre>
+  </div>
+</div>
+
+<div class="prac-card" onclick="togglePrac(this)">
+  <div class="prac-header"><div class="prac-num">P8</div><div class="prac-title">Aggregate Functions – COUNT, SUM, AVG, MIN, MAX</div><div class="prac-arrow">▶</div></div>
+  <div class="prac-body">
+    <div class="purpose-box"><div class="label">🎯 Purpose</div><p>Use aggregate functions with GROUP BY and HAVING to summarize and analyze sales data.</p></div>
+    <h3>SQL Code</h3>
+<pre><span class="kw">CREATE TABLE</span> Sales (
+  SaleID <span class="type">INT</span> <span class="kw">PRIMARY KEY</span>, Product <span class="type">VARCHAR</span>(<span class="num">50</span>),
+  Region <span class="type">VARCHAR</span>(<span class="num">30</span>), Amount <span class="type">DECIMAL</span>(<span class="num">10</span>,<span class="num">2</span>), SaleDate <span class="type">DATE</span>
+);
+<span class="kw">INSERT INTO</span> Sales <span class="kw">VALUES</span>
+(<span class="num">1</span>,<span class="str">'Laptop'</span>,<span class="str">'West'</span>,<span class="num">55000</span>,<span class="str">'2026-01-10'</span>),
+(<span class="num">2</span>,<span class="str">'Phone'</span>,<span class="str">'North'</span>,<span class="num">22000</span>,<span class="str">'2026-01-15'</span>),
+(<span class="num">3</span>,<span class="str">'Tablet'</span>,<span class="str">'West'</span>,<span class="num">18000</span>,<span class="str">'2026-02-05'</span>),
+(<span class="num">4</span>,<span class="str">'Laptop'</span>,<span class="str">'South'</span>,<span class="num">60000</span>,<span class="str">'2026-02-20'</span>);
+<span class="kw">SELECT COUNT</span>(*) <span class="kw">AS</span> Total <span class="kw">FROM</span> Sales;
+<span class="kw">SELECT SUM</span>(Amount) <span class="kw">AS</span> Revenue <span class="kw">FROM</span> Sales;
+<span class="kw">SELECT AVG</span>(Amount) <span class="kw">AS</span> AvgSale <span class="kw">FROM</span> Sales;
+<span class="kw">SELECT MIN</span>(Amount), <span class="kw">MAX</span>(Amount) <span class="kw">FROM</span> Sales;
+<span class="kw">SELECT</span> Region, <span class="kw">SUM</span>(Amount) <span class="kw">FROM</span> Sales <span class="kw">GROUP BY</span> Region <span class="kw">HAVING SUM</span>(Amount) > <span class="num">50000</span>;</pre>
+  </div>
+</div>
+
+<div class="prac-card" onclick="togglePrac(this)">
+  <div class="prac-header"><div class="prac-num">P9</div><div class="prac-title">PL/SQL – Calculate Grade of Minimum 10 Students</div><div class="prac-arrow">▶</div></div>
+  <div class="prac-body">
+    <div class="purpose-box"><div class="label">🎯 Purpose</div><p>Write a PL/SQL block using cursor and loop to assign grades based on marks for 10+ students.</p></div>
+    <h3>SQL Code</h3>
+<pre><span class="kw">CREATE TABLE</span> Students (
+  RollNo <span class="type">INT</span> <span class="kw">PRIMARY KEY</span>, Name <span class="type">VARCHAR</span>(<span class="num">60</span>), Marks <span class="type">INT</span>, Grade <span class="type">CHAR</span>(<span class="num">2</span>)
+);
+<span class="kw">INSERT INTO</span> Students(RollNo,Name,Marks) <span class="kw">VALUES</span>
+(<span class="num">1</span>,<span class="str">'Aarav'</span>,<span class="num">92</span>),(<span class="num">2</span>,<span class="str">'Bela'</span>,<span class="num">78</span>),(<span class="num">3</span>,<span class="str">'Chetan'</span>,<span class="num">85</span>),
+(<span class="num">4</span>,<span class="str">'Divya'</span>,<span class="num">61</span>),(<span class="num">5</span>,<span class="str">'Eshan'</span>,<span class="num">45</span>),(<span class="num">6</span>,<span class="str">'Farida'</span>,<span class="num">73</span>),
+(<span class="num">7</span>,<span class="str">'Gaurav'</span>,<span class="num">88</span>),(<span class="num">8</span>,<span class="str">'Hina'</span>,<span class="num">55</span>),(<span class="num">9</span>,<span class="str">'Isha'</span>,<span class="num">96</span>),(<span class="num">10</span>,<span class="str">'Jay'</span>,<span class="num">67</span>);
+
+<span class="kw">DECLARE</span>
+  <span class="kw">CURSOR</span> c1 <span class="kw">IS SELECT</span> RollNo, Marks <span class="kw">FROM</span> Students;
+  v_roll  Students.RollNo%<span class="type">TYPE</span>;
+  v_marks Students.Marks%<span class="type">TYPE</span>;
+  v_grade <span class="type">CHAR</span>(<span class="num">2</span>);
+<span class="kw">BEGIN</span>
+  <span class="kw">OPEN</span> c1;
+  <span class="kw">LOOP</span>
+    <span class="kw">FETCH</span> c1 <span class="kw">INTO</span> v_roll, v_marks;
+    <span class="kw">EXIT WHEN</span> c1%NOTFOUND;
+    <span class="kw">IF</span>    v_marks>=<span class="num">90</span> <span class="kw">THEN</span> v_grade:=<span class="str">'A+'</span>;
+    <span class="kw">ELSIF</span> v_marks>=<span class="num">80</span> <span class="kw">THEN</span> v_grade:=<span class="str">'A'</span>;
+    <span class="kw">ELSIF</span> v_marks>=<span class="num">70</span> <span class="kw">THEN</span> v_grade:=<span class="str">'B'</span>;
+    <span class="kw">ELSIF</span> v_marks>=<span class="num">60</span> <span class="kw">THEN</span> v_grade:=<span class="str">'C'</span>;
+    <span class="kw">ELSE</span>                   v_grade:=<span class="str">'F'</span>;
+    <span class="kw">END IF</span>;
+    <span class="kw">UPDATE</span> Students <span class="kw">SET</span> Grade=v_grade <span class="kw">WHERE</span> RollNo=v_roll;
+  <span class="kw">END LOOP</span>;
+  <span class="kw">CLOSE</span> c1;
+<span class="kw">END</span>;
+/
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> Students;</pre>
+  </div>
+</div>
+
+<div class="prac-card" onclick="togglePrac(this)">
+  <div class="prac-header"><div class="prac-num">P10</div><div class="prac-title">MongoDB – Design & Implement 5 Queries</div><div class="prac-arrow">▶</div></div>
+  <div class="prac-body">
+    <div class="purpose-box"><div class="label">🎯 Purpose</div><p>Understand NoSQL concepts with MongoDB — insert documents and run 5 different query types.</p></div>
+    <h3>MongoDB Commands</h3>
+<pre><span class="fn">use</span> schoolDB
+
+<span class="fn">db.students.insertMany</span>([
+  { name:<span class="str">"Aisha"</span>,  age:<span class="num">20</span>, marks:<span class="num">88</span>, city:<span class="str">"Pune"</span>   },
+  { name:<span class="str">"Rohan"</span>,  age:<span class="num">21</span>, marks:<span class="num">74</span>, city:<span class="str">"Mumbai"</span> },
+  { name:<span class="str">"Meera"</span>,  age:<span class="num">19</span>, marks:<span class="num">92</span>, city:<span class="str">"Nagpur"</span> },
+  { name:<span class="str">"Vikram"</span>, age:<span class="num">22</span>, marks:<span class="num">61</span>, city:<span class="str">"Pune"</span>   },
+  { name:<span class="str">"Pooja"</span>,  age:<span class="num">20</span>, marks:<span class="num">79</span>, city:<span class="str">"Nashik"</span> }
+])
+<span class="cm">// Q1: Find all</span>
+<span class="fn">db.students.find</span>()
+<span class="cm">// Q2: From Pune only</span>
+<span class="fn">db.students.find</span>({ city:<span class="str">"Pune"</span> })
+<span class="cm">// Q3: Marks greater than 80</span>
+<span class="fn">db.students.find</span>({ marks:{ $gt:<span class="num">80</span> } })
+<span class="cm">// Q4: Update Rohan's marks</span>
+<span class="fn">db.students.updateOne</span>({ name:<span class="str">"Rohan"</span> },{ $set:{ marks:<span class="num">80</span> } })
+<span class="cm">// Q5: Delete students with marks &lt; 65</span>
+<span class="fn">db.students.deleteMany</span>({ marks:{ $lt:<span class="num">65</span> } })</pre>
+    <h3>SQL vs MongoDB</h3>
+    <ul><li>Tables/Rows → Collections/Documents</li><li>Fixed schema → Flexible JSON-like (BSON)</li><li>SELECT → find()</li><li>INSERT → insertOne/insertMany</li></ul>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- MCQ -->
+<div class="section" id="mcq">
+  <div class="mcq-top">
+    <h2>🧠 Official MCQ Quiz</h2>
+    <div class="mcq-stats" id="mcqStats">150 Questions · All Units</div>
+  </div>
+  <div class="unit-filter">
+    <button class="unit-btn active" onclick="filterUnit(0,this)">All (150)</button>
+    <button class="unit-btn" onclick="filterUnit(1,this)">Unit 1 – Intro (30)</button>
+    <button class="unit-btn" onclick="filterUnit(2,this)">Unit 2 – SQL (25)</button>
+    <button class="unit-btn" onclick="filterUnit(3,this)">Unit 3 – Normalization (25)</button>
+    <button class="unit-btn" onclick="filterUnit(4,this)">Unit 4 – Transactions (26)</button>
+    <button class="unit-btn" onclick="filterUnit(5,this)">Unit 5 – Architecture (24)</button>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <div class="score-box" id="scoreBox">
+    <div class="score-num" id="scoreNum">0</div>
+    <p id="scoreMsg"></p>
+    <button class="retry-btn" onclick="retryMCQ()">🔄 Retry</button>
+  </div>
+  <div class="mcq-list" id="mcqList"></div>
+  <button class="submit-btn" id="submitBtn" onclick="submitMCQ()">✅ Submit All Answers</button>
+</div>
+
+<script>
+function showSection(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+}
+function togglePrac(card){
+  const wasOpen=card.classList.contains('open');
+  document.querySelectorAll('.prac-card').forEach(c=>c.classList.remove('open'));
+  if(!wasOpen)card.classList.add('open');
+}
+
+const ALL_MCQS=[
+// UNIT 1
+{q:"Which of the following is an advantage of DBMS over file processing systems?",o:["Data redundancy and inconsistency","Data isolation","Data abstraction and controlled access","Limited query processing"],a:2,u:1},
+{q:"What is data abstraction in DBMS?",o:["Hiding complex details and showing only essential features","Removing redundant data","Optimizing data access","Securing the database"],a:0,u:1},
+{q:"Which of the following is NOT a component of DBMS?",o:["Database engine","File management system","Query processor","Data dictionary"],a:1,u:1},
+{q:"Which language is used for defining the structure of a database?",o:["DML","DDL","TCL","SQL"],a:1,u:1},
+{q:"What is meant by data independence in DBMS?",o:["The ability to modify data without affecting the application","The ability to access data without authentication","Storing redundant data in multiple locations","Controlling access to the data"],a:0,u:1},
+{q:"Which of the following is NOT a type of data model?",o:["Hierarchical model","Network model","Relational model","Unstructured model"],a:3,u:1},
+{q:"Which type of relationship is represented by an ER diagram?",o:["One-to-one","One-to-many","Many-to-many","All of the above"],a:3,u:1},
+{q:"In an ER diagram, what does a diamond shape represent?",o:["Attribute","Entity","Relationship","Key"],a:2,u:1},
+{q:"Which of the following is NOT a database language?",o:["SQL","JavaScript","DML","DDL"],a:1,u:1},
+{q:"Which component of DBMS is responsible for maintaining metadata?",o:["Database engine","Query processor","Data dictionary","Transaction manager"],a:2,u:1},
+{q:"Codd's rules are associated with which type of database model?",o:["Hierarchical","Relational","Object-oriented","Network"],a:1,u:1},
+{q:"Which Codd's rule states that a database must support a high-level language like SQL?",o:["Logical data independence","Comprehensive data sublanguage rule","Physical data independence","Integrity independence"],a:1,u:1},
+{q:"What does 'ER' in ER diagrams stand for?",o:["Entity Representation","Entity Relationship","Entity Record","Entity Relational"],a:1,u:1},
+{q:"In an ER model, attributes are represented by:",o:["Rectangles","Ellipses","Diamonds","Squares"],a:1,u:1},
+{q:"A key that uniquely identifies a record in a table is called a:",o:["Foreign key","Composite key","Primary key","Candidate key"],a:2,u:1},
+{q:"Which of the following is NOT a characteristic of a relational database?",o:["Data is accessed through pointers","Relationships are established through keys","Data integrity is maintained","Controlling access to the data"],a:0,u:1},
+{q:"What is a domain in the relational model?",o:["A subset of attributes","A set of allowable values for an attribute","A table's primary key","A relationship between tables"],a:1,u:1},
+{q:"Which of the following is NOT a type of key in a database?",o:["Candidate key","Primary key","Unique key","Exclusive key"],a:3,u:1},
+{q:"Which tool is commonly used for creating and managing MySQL databases in XAMPP?",o:["Apache Server","phpMyAdmin","MySQL Command Line","SQL Studio"],a:1,u:1},
+{q:"In the relational model, what do tuples represent?",o:["Columns in a table","Rows in a table","Constraints on data","Relationships between tables"],a:1,u:1},
+{q:"What does the term 'system catalog' refer to?",o:["A user table storing customer data","Metadata about database structure and objects","Data files used for system recovery","Temporary storage for queries"],a:1,u:1},
+{q:"What is the purpose of constraints in a database?",o:["To prevent unauthorized access","To specify rules for data integrity","To reduce storage requirements","To improve query performance"],a:1,u:1},
+{q:"Which of the following is a multi-user DBMS architecture?",o:["Single-tier architecture","Two-tier architecture","Three-tier architecture","Both B and C"],a:3,u:1},
+{q:"Which of the following is a component of the ER model?",o:["Attributes","Relationships","Entities","All of the above"],a:3,u:1},
+{q:"Which database tool is used in XAMPP to interact with MySQL?",o:["SQL Server Management Studio","phpMyAdmin","PostgreSQL","MongoDB Compass"],a:1,u:1},
+{q:"Which property ensures that data remains consistent and reliable in a DBMS?",o:["Redundancy","Scalability","Efficiency","Data Integrity"],a:3,u:1},
+{q:"In an ER model, weak entities are represented by:",o:["Double rectangles","Double diamonds","Dashed lines","Double ellipses"],a:0,u:1},
+{q:"Which of the following is true about attributes in the ER model?",o:["They represent relationships","They represent the properties of entities","They connect entities","They are not a part of ER diagrams"],a:1,u:1},
+{q:"Which of the following is an example of a relational database?",o:["MongoDB","PostgreSQL","Redis","DynamoDB"],a:1,u:1},
+{q:"Converting an ER diagram into tables involves:",o:["Mapping entities and attributes to rows and columns","Removing constraints","Using only weak entities","Ignoring relationships"],a:0,u:1},
+// UNIT 2
+{q:"Which of the following is a DDL command in SQL?",o:["SELECT","UPDATE","CREATE","INSERT"],a:2,u:2},
+{q:"What does DML stand for?",o:["Data Manipulation Language","Data Management Language","Database Modification Language","Data Markup Language"],a:0,u:2},
+{q:"Which SQL clause is used to filter records?",o:["WHERE","ORDER BY","GROUP BY","HAVING"],a:0,u:2},
+{q:"Which SQL keyword is used to retrieve unique values?",o:["UNIQUE","DISTINCT","SEPARATE","FILTER"],a:1,u:2},
+{q:"Which of the following is NOT an aggregate function?",o:["COUNT","SUM","AVG","ORDER BY"],a:3,u:2},
+{q:"What is the purpose of the SQL GROUP BY clause?",o:["Filter records","Sort records","Group records with similar values","Delete duplicate records"],a:2,u:2},
+{q:"Which SQL statement is used to insert new records in a table?",o:["INSERT INTO","ADD RECORD","UPDATE TABLE","NEW ENTRY"],a:0,u:2},
+{q:"What is the default sorting order of ORDER BY clause?",o:["Ascending","Descending","Random","None"],a:0,u:2},
+{q:"Which SQL function returns the number of records in a query?",o:["SUM()","COUNT()","TOTAL()","NUMBER()"],a:1,u:2},
+{q:"Which SQL operator is used to check for a NULL value?",o:["=","!=","IS NULL","NULL"],a:2,u:2},
+{q:"Which of the following is a valid SQL data type?",o:["Integer","Character","Boolean","All of the above"],a:3,u:2},
+{q:"Which SQL command is used to create a view?",o:["DEFINE VIEW","MAKE VIEW","CREATE VIEW","VIEW CREATE"],a:2,u:2},
+{q:"Which SQL clause is used to sort the result-set?",o:["SORT BY","ORDER BY","GROUP BY","FILTER BY"],a:1,u:2},
+{q:"What does the HAVING clause do in SQL?",o:["Filters records","Sorts records","Filters grouped records","Joins tables"],a:2,u:2},
+{q:"Which statement is true about primary keys?",o:["A table can have multiple primary keys","A primary key can have NULL values","Primary key uniquely identifies a row","Primary key allows duplicate values"],a:2,u:2},
+{q:"Which of the following is NOT a SQL join type?",o:["INNER JOIN","OUTER JOIN","CROSS JOIN","MERGE JOIN"],a:3,u:2},
+{q:"What is the purpose of the SQL UNION operator?",o:["Combine result sets without duplicates","Combine result sets with duplicates","Join two tables","Sort records"],a:0,u:2},
+{q:"Which SQL clause is used to rename a column in the output?",o:["ALIAS","RENAME","AS","CHANGE"],a:2,u:2},
+{q:"Which statement correctly deletes all records from a table?",o:["DELETE * FROM table_name","DELETE FROM table_name","TRUNCATE TABLE table_name","REMOVE FROM table_name"],a:2,u:2},
+{q:"Which SQL keyword retrieves data from multiple tables?",o:["JOIN","MERGE","COMBINE","UNION"],a:0,u:2},
+{q:"What does the SQL LIMIT clause do?",o:["Filters records","Sorts records","Limits the number of rows returned","Joins tables"],a:2,u:2},
+{q:"Which SQL keyword modifies existing records in a table?",o:["MODIFY","CHANGE","UPDATE","ALTER"],a:2,u:2},
+{q:"Which SQL function returns the highest value in a column?",o:["MAX()","HIGH()","TOP()","LARGEST()"],a:0,u:2},
+{q:"What is the purpose of a SQL stored procedure?",o:["Automate repetitive SQL operations","Store query results","Create temporary tables","Sort query output"],a:0,u:2},
+{q:"Which SQL trigger event occurs before an INSERT operation?",o:["BEFORE INSERT","AFTER INSERT","ON INSERT","INSERT EVENT"],a:0,u:2},
+// UNIT 3
+{q:"What is the main purpose of normalization in a relational database?",o:["To eliminate redundancy and improve data integrity","To increase data redundancy","To make database design more complex","To store data in a non-structured format"],a:0,u:3},
+{q:"Which normal form ensures that there are no partial dependencies in a table?",o:["1NF","2NF","3NF","BCNF"],a:1,u:3},
+{q:"Which of the following is NOT a type of anomaly caused by data redundancy?",o:["Insertion anomaly","Deletion anomaly","Modification anomaly","Referential anomaly"],a:3,u:3},
+{q:"A relation is in BCNF if it is in 3NF and has:",o:["No transitive dependencies","No partial dependencies","Only trivial functional dependencies","No candidate keys"],a:2,u:3},
+{q:"What is a functional dependency in a relational database?",o:["A constraint between two attributes","A relation between two tables","A method to store large data","A process of indexing data"],a:0,u:3},
+{q:"Which SQL operation retrieves data from multiple tables based on a related column?",o:["SELECT","JOIN","GROUP BY","HAVING"],a:1,u:3},
+{q:"What is the purpose of query optimization?",o:["To minimize query execution time","To increase redundancy","To create complex queries","To reduce normalization"],a:0,u:3},
+{q:"Which measure is commonly used to evaluate query performance?",o:["Number of indexes","Query cost","Query size","Table size"],a:1,u:3},
+{q:"Which normal form removes transitive dependencies?",o:["1NF","2NF","3NF","BCNF"],a:2,u:3},
+{q:"Which join operation returns only matching rows from both tables?",o:["LEFT JOIN","RIGHT JOIN","INNER JOIN","FULL OUTER JOIN"],a:2,u:3},
+{q:"A table is in 1NF if:",o:["All attributes are atomic","It has a primary key","There are no duplicate rows","It has a foreign key"],a:0,u:3},
+{q:"Which normalization form is considered the strictest?",o:["1NF","2NF","3NF","BCNF"],a:3,u:3},
+{q:"What is the first step in normalization?",o:["Eliminating repeating groups","Removing transitive dependencies","Identifying foreign keys","Denormalization"],a:0,u:3},
+{q:"What does an update anomaly result in?",o:["Inconsistent data","Loss of data","Better performance","Faster queries"],a:0,u:3},
+{q:"What type of join retrieves all records from both tables?",o:["INNER JOIN","OUTER JOIN","SELF JOIN","CROSS JOIN"],a:1,u:3},
+{q:"Which of the following is NOT a measure of query cost?",o:["CPU cost","I/O cost","Memory cost","Indexing cost"],a:3,u:3},
+{q:"In query processing, what does the selection operation do?",o:["Filters specific rows","Filters specific columns","Joins two tables","Orders the result"],a:0,u:3},
+{q:"In query optimization, transformation of relational expressions means:",o:["Changing query structure to improve efficiency","Deleting unnecessary tables","Removing columns","Changing attribute names"],a:0,u:3},
+{q:"What is a primary benefit of BCNF?",o:["Eliminates redundancy","Increases redundancy","Improves query complexity","Allows duplicate data"],a:0,u:3},
+{q:"Which technique estimates query performance?",o:["Query transformation","Query estimation","Query execution plan","Query optimization"],a:2,u:3},
+{q:"Which of the following is a step in query processing?",o:["Query parsing","Query normalization","Query validation","Query execution"],a:0,u:3},
+{q:"Which type of join combines all records from two tables?",o:["INNER JOIN","LEFT JOIN","FULL OUTER JOIN","RIGHT JOIN"],a:2,u:3},
+{q:"What is an advantage of query optimization?",o:["Faster execution","Increased redundancy","More storage usage","Slower performance"],a:0,u:3},
+{q:"Which normal form eliminates partial dependencies?",o:["1NF","2NF","3NF","BCNF"],a:1,u:3},
+{q:"Which join returns rows where there is NO match in the joined table?",o:["INNER JOIN","LEFT JOIN with NULL check","CROSS JOIN","SELF JOIN"],a:1,u:3},
+// UNIT 4
+{q:"What is the primary goal of transaction management in a database?",o:["To ensure data consistency, integrity, and isolation","To speed up query execution","To reduce storage space","To enhance the user interface"],a:0,u:4},
+{q:"Which ACID property ensures that either all parts of a transaction are executed or none?",o:["Atomicity","Consistency","Isolation","Durability"],a:0,u:4},
+{q:"What is the purpose of a database lock?",o:["To prevent unauthorized user access","To ensure concurrent transactions do not cause data inconsistency","To reduce memory usage","To optimize query execution speed"],a:1,u:4},
+{q:"Which type of lock allows multiple transactions to read but prevents write operations?",o:["Shared Lock","Exclusive Lock","Deadlock","Binary Lock"],a:0,u:4},
+{q:"What happens when a deadlock occurs in a database system?",o:["Transactions wait indefinitely for resources","Transactions complete successfully","The system speeds up execution","The system automatically rolls back all transactions"],a:0,u:4},
+{q:"Which of the following is NOT a concurrency control technique?",o:["Two-Phase Locking","Time Stamping","Query Optimization","Multiversion Concurrency Control"],a:2,u:4},
+{q:"Which protocol ensures transactions acquire all locks before releasing any?",o:["Two-Phase Locking","Optimistic Concurrency Control","Deadlock Prevention","Shadow Paging"],a:0,u:4},
+{q:"What is the purpose of a transaction log in a database?",o:["To store history of all executed queries","To track changes for recovery purposes","To improve query speed","To store metadata information"],a:1,u:4},
+{q:"Which technique is used to recover a database after a system crash?",o:["Shadow Paging","Normalization","Indexing","Denormalization"],a:0,u:4},
+{q:"What does the 'Durability' property of ACID ensure?",o:["Changes made by a committed transaction persist even after a system failure","Transactions execute sequentially","Data is normalized","Only one transaction can run at a time"],a:0,u:4},
+{q:"Which of the following is a common reason for deadlocks?",o:["Cyclic waiting for resources","Too many indexes","Poor query performance","Lack of database normalization"],a:0,u:4},
+{q:"Which statement about serializability in databases is TRUE?",o:["A schedule is serializable if it produces the same results as a serial schedule","Serializable schedules allow conflicts","Non-serializable schedules are always correct","It ensures data redundancy"],a:0,u:4},
+{q:"Which of the following is NOT an isolation level in SQL?",o:["Read Committed","Repeatable Read","Serializable","Two-Phase Locking"],a:3,u:4},
+{q:"Which techniques are used to break a deadlock?",o:["Wait-Die and Wound-Wait","Indexing","Denormalization","Normalization"],a:0,u:4},
+{q:"Which concurrency control method does NOT use locks?",o:["Timestamp Ordering","Two-Phase Locking","Strict Two-Phase Locking","Shared Locking"],a:0,u:4},
+{q:"What does a write-ahead log (WAL) ensure in a database system?",o:["Changes are written to the log before applying to the database","Transactions execute faster","It prevents deadlocks","It eliminates the need for locks"],a:0,u:4},
+{q:"What is the primary purpose of database checkpoints?",o:["To reduce system downtime during recovery","To optimize queries","To prevent deadlocks","To normalize the database"],a:0,u:4},
+{q:"Which isolation level allows dirty reads?",o:["Read Uncommitted","Read Committed","Repeatable Read","Serializable"],a:0,u:4},
+{q:"Which method avoids cascading rollbacks in transactions?",o:["Strict Two-Phase Locking","Shared Locking","Time Stamping","Optimistic Concurrency Control"],a:0,u:4},
+{q:"Which statement about optimistic concurrency control is TRUE?",o:["It assumes conflicts are rare and delays validation until commit","It prevents all conflicts","It uses strict locking mechanisms","It requires high memory usage"],a:0,u:4},
+{q:"Which technique suits a system with many reads and few writes?",o:["Optimistic Concurrency Control","Two-Phase Locking","Strict Two-Phase Locking","Deadlock Detection"],a:0,u:4},
+{q:"Which concurrency control technique maintains multiple versions of a data item?",o:["Multiversion Concurrency Control (MVCC)","Two-Phase Locking","Serial Execution","Shadow Paging"],a:0,u:4},
+{q:"What is the main goal of deadlock prevention techniques?",o:["To ensure transactions do not wait indefinitely for resources","To optimize queries","To minimize disk usage","To improve indexing"],a:0,u:4},
+{q:"Which transaction property ensures changes by a committed transaction are permanent?",o:["Durability","Atomicity","Consistency","Isolation"],a:0,u:4},
+{q:"Which ACID property ensures the DB moves from one valid state to another?",o:["Atomicity","Consistency","Isolation","Durability"],a:1,u:4},
+{q:"An exclusive lock in a database means:",o:["Multiple users can read","Only one transaction can read or write","All transactions are blocked","Data is deleted after use"],a:1,u:4},
+// UNIT 5
+{q:"Which of the following is NOT a database architecture?",o:["Centralized","Client-Server","2-Tier","Decentralized"],a:3,u:5},
+{q:"Which architecture consists of a database server and multiple client machines?",o:["Centralized","Client-Server","Distributed","Parallel"],a:1,u:5},
+{q:"What is a key feature of a Parallel Database?",o:["Single processor handling all queries","Multiple processors working together","Only one transaction at a time","No distributed computing"],a:1,u:5},
+{q:"Which of the following is NOT an emerging database technology?",o:["NoSQL Databases","Cloud Databases","Mobile Databases","Hierarchical Databases"],a:3,u:5},
+{q:"Which of the following is an example of a NoSQL database?",o:["MySQL","PostgreSQL","MongoDB","Oracle"],a:2,u:5},
+{q:"What is the primary benefit of Cloud Databases?",o:["Lower storage capacity","Limited accessibility","Scalability and availability","Fixed storage cost"],a:2,u:5},
+{q:"Which is a lightweight, file-based database used in mobile applications?",o:["MongoDB","SQLite","PostgreSQL","Redis"],a:1,u:5},
+{q:"Which database structure best handles semi-structured data?",o:["Relational Databases","Hierarchical Databases","XML Databases","Object-Oriented Databases"],a:2,u:5},
+{q:"Which of the following is NOT an advantage of Distributed Databases?",o:["Improved Reliability","Lower Network Latency","Better Performance","Scalability"],a:1,u:5},
+{q:"What does a 2-Tier Database Architecture consist of?",o:["Client and Database Server","Client, Middleware, and Database Server","Client, Application Server, and Database Server","Multiple Clients Only"],a:0,u:5},
+{q:"What is an advantage of Parallel Databases?",o:["Slower query execution","Higher transaction cost","Improved performance","Limited scalability"],a:2,u:5},
+{q:"Which of the following is a distributed database architecture?",o:["Client-Server","Centralized","Homogeneous","2-Tier"],a:2,u:5},
+{q:"Which database system best suits real-time inventory tracking?",o:["Hierarchical Database","Relational Database","Distributed Database","Graph Database"],a:2,u:5},
+{q:"Which type of NoSQL database best manages relationships between entities?",o:["Document Store","Key-Value Store","Column Family Store","Graph Database"],a:3,u:5},
+{q:"What is a disadvantage of NoSQL databases?",o:["High Scalability","Flexible Schema","Lack of ACID compliance","Fast Query Processing"],a:2,u:5},
+{q:"Which of the following supports JSON document storage?",o:["MongoDB","Oracle","MySQL","SQLite"],a:0,u:5},
+{q:"Which database type is most used in Big Data applications?",o:["Relational Databases","NoSQL Databases","Hierarchical Databases","Network Databases"],a:1,u:5},
+{q:"Which SQL database is widely used in cloud-based applications?",o:["MySQL","PostgreSQL","SQLite","Both MySQL and PostgreSQL"],a:3,u:5},
+{q:"What is a common method for ensuring data consistency in distributed databases?",o:["Sharding","Replication","Partitioning","Compression"],a:1,u:5},
+{q:"Which of the following is a feature of cloud databases?",o:["On-premise storage","Scalability","Single access point","Fixed cost"],a:1,u:5},
+{q:"What is the primary function of XML databases?",o:["Store relational data","Store unstructured textual data","Store semi-structured data","Only handle SQL queries"],a:2,u:5},
+{q:"Which component of a database architecture interacts with end-users?",o:["Database Server","Middleware","Client","Query Optimizer"],a:2,u:5},
+{q:"Which of the following is NOT a key element of parallel database processing?",o:["Multiple CPUs","High latency","Efficient Query Execution","Data Partitioning"],a:1,u:5},
+{q:"Which technique improves query efficiency in large-scale distributed databases?",o:["Indexing","Replication","Query Rewriting","All of the above"],a:3,u:5},
+];
+
+let activeUnit=0, filteredMCQs=[...ALL_MCQS], userAnswers=new Array(ALL_MCQS.length).fill(-1), submitted=false;
+
+function filterUnit(unit,btn){
+  activeUnit=unit;
+  document.querySelectorAll('.unit-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  filteredMCQs=unit===0?[...ALL_MCQS]:ALL_MCQS.filter(q=>q.u===unit);
+  userAnswers=new Array(filteredMCQs.length).fill(-1);
+  submitted=false;
+  document.getElementById('scoreBox').style.display='none';
+  document.getElementById('submitBtn').style.display='block';
+  document.getElementById('progressFill').style.width='0%';
+  document.getElementById('mcqStats').textContent=filteredMCQs.length+' Questions · '+(unit===0?'All Units':'Unit '+unit);
+  renderMCQ();
+}
+
+function renderMCQ(){
+  const list=document.getElementById('mcqList');
+  list.innerHTML='';
+  filteredMCQs.forEach((q,qi)=>{
+    const item=document.createElement('div');
+    item.className='mcq-item'; item.id='mcq-'+qi;
+    const opts=q.o.map((o,oi)=>`<div class="mcq-option" id="opt-${qi}-${oi}" onclick="selectOpt(${qi},${oi})"><span class="opt-label">${'ABCD'[oi]}</span>${o}</div>`).join('');
+    item.innerHTML=`<div class="mcq-q"><span>Q${qi+1}.</span>${q.q}<span class="unit-tag">U${q.u}</span></div><div class="mcq-options">${opts}</div><div class="mcq-explain" id="exp-${qi}">✅ Correct: <strong>${'ABCD'[q.a]}) ${q.o[q.a]}</strong></div>`;
+    list.appendChild(item);
+  });
+}
+
+function selectOpt(qi,oi){
+  if(submitted)return;
+  userAnswers[qi]=oi;
+  document.querySelectorAll(`[id^="opt-${qi}-"]`).forEach(el=>el.classList.remove('selected'));
+  document.getElementById(`opt-${qi}-${oi}`).classList.add('selected');
+  document.getElementById('progressFill').style.width=(userAnswers.filter(a=>a!==-1).length/filteredMCQs.length*100)+'%';
+}
+
+function submitMCQ(){
+  submitted=true;
+  let score=0;
+  filteredMCQs.forEach((q,qi)=>{
+    const item=document.getElementById('mcq-'+qi);
+    item.classList.add('revealed');
+    document.querySelectorAll(`[id^="opt-${qi}-"]`).forEach((el,oi)=>{
+      el.style.pointerEvents='none';
+      if(oi===q.a)el.classList.add('correct');
+      else if(oi===userAnswers[qi]&&userAnswers[qi]!==q.a)el.classList.add('wrong');
+    });
+    if(userAnswers[qi]===q.a)score++;
+  });
+  const total=filteredMCQs.length;
+  const sb=document.getElementById('scoreBox');
+  sb.style.display='block';
+  document.getElementById('scoreNum').textContent=score+'/'+total;
+  const pct=score/total*100;
+  document.getElementById('scoreMsg').textContent=pct>=80?'🎉 Excellent! You are exam-ready!':pct>=60?'👍 Good job! Review the wrong ones.':'📖 Keep practising. Check the correct answers below!';
+  document.getElementById('submitBtn').style.display='none';
+  sb.scrollIntoView({behavior:'smooth'});
+}
+
+function retryMCQ(){
+  submitted=false;
+  userAnswers=new Array(filteredMCQs.length).fill(-1);
+  document.getElementById('scoreBox').style.display='none';
+  document.getElementById('submitBtn').style.display='block';
+  document.getElementById('progressFill').style.width='0%';
+  renderMCQ();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+renderMCQ();
+</script>
+</body>
+</html>
